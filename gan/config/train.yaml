@@ -1,0 +1,9 @@
+defaults:
+  - model: mnist
+  - dataset: mnist
+
+
+
+hydra:
+  run:
+    dir: saved_models/${model}-${dataset}${scheduler}-${now:%Y_%m_%d_%H_%M_%S}
