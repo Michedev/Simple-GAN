@@ -34,7 +34,7 @@ class PositionalEmbedding(torch.nn.Module):
 
 class GAN(pl.LightningModule):
 
-    def __init__(self, latent_size: int, discriminator_steps: int, name: str,
+    def __init__(self, latent_size: int, discriminator_steps: int,
                  generator: torch.nn.Module, discriminator: torch.nn.Module,
                  discriminator_loss_log_steps: int, generator_loss_log_steps: int):
         super().__init__()
