@@ -16,8 +16,8 @@ def train(config):
     train_set = hydra.utils.instantiate(config.dataset.train)
     test_set = hydra.utils.instantiate(config.dataset.test)
 
-    train_dl = DataLoader(train_set, shuffle=True)
-    test_dl = DataLoader(test_set, shuffle=True)
+    train_dl = DataLoader(train_set, shuffle=True, batch_size=config.batch_size)
+    test_dl = DataLoader(test_set, shuffle=True, batch_size=config.batch_size)
 
     checkpoint = ModelCheckpoint('./', monitor='loss/val_generator', save_top_k=3)
 

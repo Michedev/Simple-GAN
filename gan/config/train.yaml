@@ -4,6 +4,7 @@ defaults:
 
 val_interval: 1_000
 val_steps: 50
+batch_size: 32
 
 hydra:
   run:
