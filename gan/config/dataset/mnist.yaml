@@ -6,6 +6,8 @@ train:
   root: ${dataset.files_location}
   train: true
   download: true
+  transform:
+    _target_: torchvision.transforms.ToTensor
 
 test:
   _target_: torchvision.datasets.MNIST
