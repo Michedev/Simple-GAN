@@ -5,6 +5,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from torch.utils.data import DataLoader
 from gan.paths import CONFIG
 
+omegaconf.OmegaConf.register_new_resolver('sum', lambda *x: sum(float(el) for el in x))
+
 
 @hydra.main(CONFIG, 'train')
 def train(config):
