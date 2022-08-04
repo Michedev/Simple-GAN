@@ -50,6 +50,7 @@ class GAN(pl.LightningModule):
         self.it_generator = 0
         self.discriminator_loss_log_steps = discriminator_loss_log_steps
         self.generator_loss_log_steps = generator_loss_log_steps
+        self.automatic_optimization = False
 
     def forward(self, batch_size=None):
         batch_size = batch_size or 1
@@ -57,9 +58,12 @@ class GAN(pl.LightningModule):
         return self.generator(z)
 
     def training_step(self, batch, batch_idx):
+        opt_gen, opt_discr = self.optimizers()
         X, y = batch
         fake_batch = self(X.size(0))
         if self.it_discriminator < self.discriminator_steps:
+            opt_discr.zero_grad()
+            fake_batch = fake_batch.detach()
             logit_true = self.discriminator(X)
             logit_fake = self.discriminator(fake_batch)
 
@@ -68,14 +72,17 @@ class GAN(pl.LightningModule):
             if self.it_discriminator % self.discriminator_loss_log_steps == 0:
                 self.log('loss/train_discriminator', loss)
             self.it_discriminator += 1
+            loss.backward()
+            opt_discr.step()
         else:
-            with torch.no_grad():
-                logit_fake = self.discriminator(fake_batch)
+            opt_gen.zero_grad()
+            logit_fake = self.discriminator(fake_batch)
             self.it_discriminator = 0
             loss = (1 - logit_fake).log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('loss/train_generator', loss)
             self.it_generator += 1
+            opt_gen.step()
         self.iteration += 1
         return loss
 
@@ -97,4 +104,5 @@ class GAN(pl.LightningModule):
         # return dict(loss_generator=loss_generator, loss_discriminator=loss_discriminator, fake_batch=fake_batch)
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), 1e-4)
+        return [torch.optim.Adam(self.generator.parameters(), 1e-4),
+                torch.optim.Adam(self.discriminator.parameters(), 1e-4)]
