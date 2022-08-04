@@ -12,8 +12,8 @@ generator:
       height: ${dataset.height}
       channels: ${model.latent_size}
     - _target_: torch.nn.Conv2d
-      in_channels: ${sum:${model.latent_size},1}
-      out_channels: 16,
+      in_channels: ${model.latent_size}
+      out_channels: 16
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.ReLU
