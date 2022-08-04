@@ -46,7 +46,7 @@ class GAN(pl.LightningModule):
         self.it_discriminator = 0
         self.iteration = 0
         self.iteration_discriminator = 0
-        self.iteration_generator = 0
+        self.it_generator = 0
         self.discriminator_loss_log_steps = discriminator_loss_log_steps
         self.generator_loss_log_steps = generator_loss_log_steps
 
@@ -62,15 +62,21 @@ class GAN(pl.LightningModule):
             logit_fake = self.discriminator(fake_batch)
             loss = logit_true.sigmoid().log() + (1 - logit_fake).log()
             loss = - loss.mean(dim=0).sum()
-            self.log('loss/train_discriminator', loss)
-            self.iteration_discriminator += 1
+            if self.it_discriminator % self.discriminator_loss_log_steps  == 0:
+                self.log('loss/train_discriminator', loss)
+                self.it_discriminator = 0
+            else:
+                self.it_discriminator += 1
         else:
             with torch.no_grad():
                 logit_fake = self.discriminator(fake_batch)
             self.it_discriminator = 0
             loss = (1 - logit_fake).log().mean(dim=0).sum()
-            self.log('loss/train_generator', loss)
-            self.iteration_generator += 1
+            if self.it_generator % self.generator_loss_log_steps == 0:
+                self.log('loss/train_generator', loss)
+                self.it_generator = 0
+            else:
+                self.it_generator += 1
         self.iteration += 1
         return loss
 
