@@ -28,7 +28,8 @@ class PositionalEmbedding(torch.nn.Module):
 
     def forward(self, x):
         self.pos_map = self.pos_map.to(x.device)
-        x = torch.cat([x, self.pos_map], dim=1)
+        pos_map_expanded = self.pos_map.expand(x.size(0), -1, -1, -1)
+        x = torch.cat([x, pos_map_expanded], dim=1)
         return self.linear_mapping(x)
 
 
