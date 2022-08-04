@@ -94,7 +94,7 @@ class GAN(pl.LightningModule):
         self.logger.experiment.add_image('val/gen_images', grid_fake_batch, global_step=self.iteration)
         logit_true = self.discriminator(X)
         logit_fake = self.discriminator(fake_batch)
-        loss_discriminator = logit_true.sigmoid().log() + (1 - logit_fake).log()
+        loss_discriminator = logit_true.log() + (1 - logit_fake).log()
         loss_discriminator = - loss_discriminator.mean(dim=0).sum()
         self.log('loss/val_discriminator', loss_discriminator)
         loss_generator = (1 - logit_fake).log().mean(dim=0).sum()
