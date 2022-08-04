@@ -79,7 +79,7 @@ class GAN(pl.LightningModule):
         else:
             opt_gen.zero_grad()
             p_fake = self.discriminator(fake_batch) + 1e-5
-            loss = (1 - p_fake).log().mean(dim=0).sum()
+            loss = (1-p_fake).log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('loss/train_generator', loss, prog_bar=True)
             self.it_generator += 1
@@ -106,5 +106,5 @@ class GAN(pl.LightningModule):
         # return dict(loss_generator=loss_generator, loss_discriminator=loss_discriminator, fake_batch=fake_batch)
 
     def configure_optimizers(self):
-        return [torch.optim.Adam(self.generator.parameters(), 1e-4),
-                torch.optim.Adam(self.discriminator.parameters(), 1e-4)]
+        return [torch.optim.SGD(self.generator.parameters(), 1e-5, momentum=0.9),
+                torch.optim.SGD(self.discriminator.parameters(), 1e-5, momentum=0.9)]
