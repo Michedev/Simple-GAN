@@ -84,8 +84,6 @@ discriminator:
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.ReLU
-    - _target_: torch.nn.MaxPool2d
-      kernel_size: 2
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
 

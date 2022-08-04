@@ -62,6 +62,7 @@ class GAN(pl.LightningModule):
         if self.it_discriminator < self.discriminator_steps:
             logit_true = self.discriminator(X)
             logit_fake = self.discriminator(fake_batch)
+
             loss = logit_true.sigmoid().log() + (1 - logit_fake).log()
             loss = - loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps  == 0:
