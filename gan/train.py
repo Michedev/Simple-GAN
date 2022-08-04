@@ -1,4 +1,5 @@
 import hydra
+import omegaconf
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from torch.utils.data import DataLoader
@@ -7,6 +8,8 @@ from gan.paths import CONFIG
 
 @hydra.main(CONFIG, 'train')
 def train(config):
+    with open('config.yaml', 'w') as f:
+        omegaconf.OmegaConf.save(config, f)
     model = hydra.utils.instantiate(config.model)
     train_set = hydra.utils.instantiate(config.dataset.train)
     test_set = hydra.utils.instantiate(config.dataset.test)

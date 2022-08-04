@@ -7,4 +7,4 @@ val_steps: 50
 
 hydra:
   run:
-    dir: saved_models/${model}-${dataset}-${now:%Y_%m_%d_%H_%M_%S}
+    dir: saved_models/${now:%Y_%m_%d_%H_%M_%S}
