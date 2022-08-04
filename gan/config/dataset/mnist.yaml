@@ -15,3 +15,5 @@ test:
   root: ${dataset.files_location}
   train: false
   download: true
+  transform:
+    _target_: torchvision.transforms.ToTensor
