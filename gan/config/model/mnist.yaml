@@ -21,18 +21,24 @@ generator:
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
-      out_channels: 16
+      out_channels: 32
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.Conv2d
-      in_channels: 16
-      out_channels: 16
+      in_channels: 32
+      out_channels: 32
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.Conv2d
-      in_channels: 16
+      in_channels: 32
+      out_channels: 32
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 32
       out_channels: ${dataset.input_channels}
       kernel_size: 3
       padding: 1
@@ -42,6 +48,18 @@ discriminator:
   _args_:
     - _target_: torch.nn.Conv2d
       in_channels: ${dataset.input_channels}
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
       out_channels: 16
       kernel_size: 3
       padding: 1
@@ -86,5 +104,3 @@ discriminator:
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
-
-

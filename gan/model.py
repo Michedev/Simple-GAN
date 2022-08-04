@@ -51,6 +51,7 @@ class GAN(pl.LightningModule):
         self.discriminator_loss_log_steps = discriminator_loss_log_steps
         self.generator_loss_log_steps = generator_loss_log_steps
         self.automatic_optimization = False
+        self.it_phase = 0
 
     def forward(self, batch_size=None):
         batch_size = batch_size or 1
@@ -61,7 +62,7 @@ class GAN(pl.LightningModule):
         opt_gen, opt_discr = self.optimizers()
         X, y = batch
         fake_batch = self(X.size(0))
-        if self.it_discriminator % self.discriminator_steps == 0:
+        if self.it_phase < self.discriminator_steps:
             opt_discr.zero_grad()
             fake_batch = fake_batch.detach()
             p_true = self.discriminator(X) + 1e-5
@@ -74,6 +75,7 @@ class GAN(pl.LightningModule):
             self.it_discriminator += 1
             loss.backward()
             opt_discr.step()
+            self.it_phase += 1
         else:
             opt_gen.zero_grad()
             p_fake = self.discriminator(fake_batch) + 1e-5
@@ -82,6 +84,7 @@ class GAN(pl.LightningModule):
                 self.log('loss/train_generator', loss, prog_bar=True)
             self.it_generator += 1
             opt_gen.step()
+            self.it_phase = 0
         self.iteration += 1
         return loss
 
