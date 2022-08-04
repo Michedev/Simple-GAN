@@ -65,11 +65,9 @@ class GAN(pl.LightningModule):
 
             loss = logit_true.sigmoid().log() + (1 - logit_fake).log()
             loss = - loss.mean(dim=0).sum()
-            if self.it_discriminator % self.discriminator_loss_log_steps  == 0:
+            if self.it_discriminator % self.discriminator_loss_log_steps == 0:
                 self.log('loss/train_discriminator', loss)
-                self.it_discriminator = 0
-            else:
-                self.it_discriminator += 1
+            self.it_discriminator += 1
         else:
             with torch.no_grad():
                 logit_fake = self.discriminator(fake_batch)
@@ -77,13 +75,11 @@ class GAN(pl.LightningModule):
             loss = (1 - logit_fake).log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('loss/train_generator', loss)
-                self.it_generator = 0
-            else:
-                self.it_generator += 1
+            self.it_generator += 1
         self.iteration += 1
         return loss
 
-    def val_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx):
         X, y = batch
         fake_batch = self(X.size(0))
         grid_fake_batch = torchvision.utils.make_grid(
