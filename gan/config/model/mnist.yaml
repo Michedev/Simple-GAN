@@ -34,6 +34,7 @@ generator:
       out_channels: 3
       kernel_size: 3
       padding: 1
+    - _target_: torch.nn.Sigmoid
 discriminator:
   _target_: torch.nn.Sequential
   _args_:

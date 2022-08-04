@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+import torchvision.utils
 
 
 class ExpandLatentSpace(torch.nn.Module):
@@ -38,6 +39,7 @@ class GAN(pl.LightningModule):
                  discriminator_loss_log_steps: int, generator_loss_log_steps: int):
         super().__init__()
         self.latent_size = latent_size
+        self.latent_dim = latent_size
         self.discriminator_steps = discriminator_steps
         self.generator = generator
         self.discriminator = discriminator
@@ -71,3 +73,19 @@ class GAN(pl.LightningModule):
             self.iteration_generator += 1
         self.iteration += 1
         return loss
+
+    def val_step(self, batch, batch_idx):
+        fake_batch = self(batch.size(0))
+        grid_fake_batch = torchvision.utils.make_grid(
+            fake_batch
+        )
+        self.logger.experiment.add_image('val/gen_images', grid_fake_batch, global_step=self.iteration)
+        logit_true = self.discriminator(batch)
+        logit_fake = self.discriminator(fake_batch)
+        loss_discriminator = logit_true.sigmoid().log() + (1 - logit_fake).log()
+        loss_discriminator = - loss_discriminator.mean(dim=0).sum()
+        self.log('loss/val_discriminator', loss_discriminator)
+        loss_generator = (1 - logit_fake).log().mean(dim=0).sum()
+        self.log('loss/val_generator', loss_generator)
+        self.iteration += 1
+        # return dict(loss_generator=loss_generator, loss_discriminator=loss_discriminator, fake_batch=fake_batch)
