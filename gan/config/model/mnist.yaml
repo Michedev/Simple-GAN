@@ -1,0 +1,89 @@
+_target_: gan.model.GAN
+latent_size: 8
+discriminator_steps: 1
+generator:
+  _target_: torch.nn.Sequential
+  _args_:
+    - _target_: gan.model.ExpandLatentSpace
+      width: ${dataset.width}
+      height: ${dataset.height}
+    - _target_: gan.model.PositionalEmbedding
+      width: ${dataset.width}
+      height: ${dataset.height}
+      channels: ${model.latent_size}
+    - _target_: torch.nn.Conv2d
+      in_channels: ${sum:${model.latent_size},1}
+      out_channels: 16,
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 3
+      kernel_size: 3
+      padding: 1
+discriminator:
+  _target_: torch.nn.Sequential
+  _args_:
+    - _target_: torch.nn.Conv2d
+      in_channels: 3
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.MaxPool2d
+      kernel_size: 2
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 3
+      out_channels: 3
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.MaxPool2d
+      kernel_size: 2
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.MaxPool2d
+      kernel_size: 2
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.MaxPool2d
+      kernel_size: 2
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 1
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.MaxPool2d
+      kernel_size: 2
+    - _target_: torch.nn.Flatten
+      start_dim: 1  #bs, 1
+
+

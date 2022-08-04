@@ -2,6 +2,35 @@ import pytorch_lightning as pl
 import torch
 
 
+class ExpandLatentSpace(torch.nn.Module):
+
+    def __init__(self, width: int, height: int):
+        super().__init__()
+        self.width = width
+        self.height = height
+
+    def forward(self, z):
+        z: torch.Tensor = z.view(z.size(0), z.size(1), 1, 1)
+        z = z.expand(-1, -1, self.width, self.height)
+        return z
+
+
+class PositionalEmbedding(torch.nn.Module):
+
+    def __init__(self, width: int, height: int, channels: int):
+        super().__init__()
+        self.width = width
+        self.height = height
+        self.channels = channels
+        self.pos_map = torch.linspace(-1, 1, self.width * self.height, dtype=torch.float).reshape(1, 1, self.width, self.height)
+        self.linear_mapping = torch.nn.Conv2d(channels + 1, channels, kernel_size=1)
+
+    def forward(self, x):
+        self.pos_map = self.pos_map.to(x.device)
+        x = torch.cat([x, self.pos_map], dim=1)
+        return self.linear_mapping(x)
+
+
 class GAN(pl.LightningModule):
 
     def __init__(self, latent_size: int, discriminator_steps: int,
