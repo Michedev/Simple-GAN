@@ -61,26 +61,25 @@ class GAN(pl.LightningModule):
         opt_gen, opt_discr = self.optimizers()
         X, y = batch
         fake_batch = self(X.size(0))
-        if self.it_discriminator < self.discriminator_steps:
+        if self.it_discriminator % self.discriminator_steps == 0:
             opt_discr.zero_grad()
             fake_batch = fake_batch.detach()
-            logit_true = self.discriminator(X)
-            logit_fake = self.discriminator(fake_batch)
+            p_true = self.discriminator(X)
+            p_fake = self.discriminator(fake_batch)
 
-            loss = logit_true.sigmoid().log() + (1 - logit_fake).log()
+            loss = p_true.log() + (1 - p_fake).log()
             loss = - loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps == 0:
-                self.log('loss/train_discriminator', loss)
+                self.log('loss/train_discriminator', loss, prog_bar=True)
             self.it_discriminator += 1
             loss.backward()
             opt_discr.step()
         else:
             opt_gen.zero_grad()
-            logit_fake = self.discriminator(fake_batch)
-            self.it_discriminator = 0
-            loss = (1 - logit_fake).log().mean(dim=0).sum()
+            p_fake = self.discriminator(fake_batch)
+            loss = (1 - p_fake).log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
-                self.log('loss/train_generator', loss)
+                self.log('loss/train_generator', loss, prog_bar=True)
             self.it_generator += 1
             opt_gen.step()
         self.iteration += 1
