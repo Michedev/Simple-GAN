@@ -57,13 +57,15 @@ class GAN(pl.LightningModule):
         return self.generator(z)
 
     def training_step(self, batch, batch_idx):
-        X, y = batch
+        X, y = batch  # assuming images are in [0,1]
+        with torch.no_grad():
+            X = (X * 2) - 1  # now in [-1, 1]
         fake_batch = self(X.size(0))
         if self.it_discriminator < self.discriminator_steps:
-            logit_true = self.discriminator(X)
-            logit_fake = self.discriminator(fake_batch)
+            logit_true = self.discriminator(X).sigmoid()
+            logit_fake = self.discriminator(fake_batch).sigmoid()
 
-            loss = logit_true.sigmoid().log() + (1 - logit_fake).log()
+            loss = (1-logit_true).log() + logit_fake.log()
             loss = - loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps  == 0:
                 self.log('loss/train_discriminator', loss)
@@ -72,9 +74,9 @@ class GAN(pl.LightningModule):
                 self.it_discriminator += 1
         else:
             with torch.no_grad():
-                logit_fake = self.discriminator(fake_batch)
+                logit_fake = self.discriminator(fake_batch).sigmoid()
             self.it_discriminator = 0
-            loss = (1 - logit_fake).log().mean(dim=0).sum()
+            loss = logit_fake.log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('loss/train_generator', loss)
                 self.it_generator = 0

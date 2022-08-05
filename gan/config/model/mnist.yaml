@@ -36,7 +36,7 @@ generator:
       out_channels: ${dataset.input_channels}
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.Sigmoid
+    - _target_: torch.nn.Tanh
 discriminator:
   _target_: torch.nn.Sequential
   _args_:
@@ -86,5 +86,4 @@ discriminator:
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
-
 
