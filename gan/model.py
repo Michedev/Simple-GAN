@@ -62,19 +62,19 @@ class GAN(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         opt_gen, opt_discr = self.optimizers()
+        X, y = batch
         with torch.no_grad():
             X = (X * 2) - 1  # now in [-1, 1]
-        X, y = batch
         fake_batch = self(X.size(0))
         if self.iteration % self.train_log_images_steps == 0:
             self._log_stats_gen_images(fake_batch, is_train=True)
         if self.it_phase < self.discriminator_steps:
             opt_discr.zero_grad()
             fake_batch = fake_batch.detach()
-            p_true = self.discriminator(X) + 1e-5
+            p_true = self.discriminator(X)+ 1e-5
             p_fake = self.discriminator(fake_batch) + 1e-5
 
-            loss = - p_true.log() - (1 - p_fake).log()
+            loss = - (1 - p_true).log() - p_fake.log()
             loss = loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps == 0:
                 self.log('train/loss_discriminator', loss, prog_bar=True)
@@ -85,7 +85,7 @@ class GAN(pl.LightningModule):
         else:
             opt_gen.zero_grad()
             p_fake = self.discriminator(fake_batch) + 1e-5
-            loss = (1-p_fake).log().mean(dim=0).sum()
+            loss = p_fake.log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('train/loss_generator', loss, prog_bar=True)
             self.it_generator += 1
@@ -98,12 +98,12 @@ class GAN(pl.LightningModule):
         X, y = batch
         fake_batch = self(X.size(0))
         self._log_stats_gen_images(fake_batch, is_train=False)
-        logit_true = self.discriminator(X)
-        logit_fake = self.discriminator(fake_batch)
-        loss_discriminator = logit_true.log() + (1 - logit_fake).log()
+        p_true = self.discriminator(X).sigmoid()
+        p_fake = self.discriminator(fake_batch).sigmoid()
+        loss_discriminator = p_true.log() + (1 - p_fake).log()
         loss_discriminator = - loss_discriminator.mean(dim=0).sum()
         self.log('val/loss_discriminator', loss_discriminator)
-        loss_generator = (1 - logit_fake).log().mean(dim=0).sum()
+        loss_generator = (1 - p_fake).log().mean(dim=0).sum()
         self.log('val/loss_generator', loss_generator)
         self.iteration += 1
         # return dict(loss_generator=loss_generator, loss_discriminator=loss_discriminator, fake_batch=fake_batch)

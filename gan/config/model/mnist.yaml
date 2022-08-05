@@ -105,4 +105,4 @@ discriminator:
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
-
+    - _target_: torch.nn.Sigmoid
