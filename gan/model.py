@@ -133,5 +133,5 @@ class GAN(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        return [torch.optim.SGD(self.generator.parameters(), 1e-5, momentum=0.9),
-                torch.optim.SGD(self.discriminator.parameters(), 1e-5, momentum=0.9)]
+        return [torch.optim.Adam(self.generator.parameters(), 1e-3),
+                torch.optim.Adam(self.discriminator.parameters(), 1e-3)]
