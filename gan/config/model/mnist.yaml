@@ -1,8 +1,9 @@
 _target_: gan.model.GAN
 latent_size: 8
-discriminator_steps: 1
+discriminator_steps: 2
 discriminator_loss_log_steps: 100
 generator_loss_log_steps: 10
+train_log_images_steps: 100
 generator:
   _target_: torch.nn.Sequential
   _args_:
@@ -18,21 +19,27 @@ generator:
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
-      out_channels: 16
+      out_channels: 32
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
-      in_channels: 16
-      out_channels: 16
+      in_channels: 32
+      out_channels: 32
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
-      in_channels: 16
+      in_channels: 32
+      out_channels: 32
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.LeakyReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 32
       out_channels: ${dataset.input_channels}
       kernel_size: 3
       padding: 1
@@ -45,7 +52,19 @@ discriminator:
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.LeakyReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.MaxPool2d
       kernel_size: 2
     - _target_: torch.nn.Conv2d
@@ -53,13 +72,13 @@ discriminator:
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.MaxPool2d
       kernel_size: 2
     - _target_: torch.nn.Conv2d
@@ -67,7 +86,7 @@ discriminator:
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.MaxPool2d
       kernel_size: 2
     - _target_: torch.nn.Conv2d
@@ -75,7 +94,7 @@ discriminator:
       out_channels: 16
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.MaxPool2d
       kernel_size: 2
     - _target_: torch.nn.Conv2d
@@ -83,7 +102,7 @@ discriminator:
       out_channels: 1
       kernel_size: 3
       padding: 1
-    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
 
