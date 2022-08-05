@@ -98,8 +98,8 @@ class GAN(pl.LightningModule):
         X, y = batch
         fake_batch = self(X.size(0))
         self._log_stats_gen_images(fake_batch, is_train=False)
-        p_true = self.discriminator(X).sigmoid()
-        p_fake = self.discriminator(fake_batch).sigmoid()
+        p_true = self.discriminator(X)
+        p_fake = self.discriminator(fake_batch)
         loss_discriminator = p_true.log() + (1 - p_fake).log()
         loss_discriminator = - loss_discriminator.mean(dim=0).sum()
         self.log('val/loss_discriminator', loss_discriminator)
