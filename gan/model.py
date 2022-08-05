@@ -37,7 +37,8 @@ class GAN(pl.LightningModule):
 
     def __init__(self, latent_size: int, discriminator_steps: int,
                  generator: torch.nn.Module, discriminator: torch.nn.Module,
-                 discriminator_loss_log_steps: int, generator_loss_log_steps: int):
+                 discriminator_loss_log_steps: int, generator_loss_log_steps: int,
+                 train_log_images_steps: int):
         super().__init__()
         self.latent_size = latent_size
         self.latent_dim = latent_size
@@ -50,6 +51,7 @@ class GAN(pl.LightningModule):
         self.it_generator = 0
         self.discriminator_loss_log_steps = discriminator_loss_log_steps
         self.generator_loss_log_steps = generator_loss_log_steps
+        self.train_log_images_steps = train_log_images_steps
         self.automatic_optimization = False
         self.it_phase = 0
 
@@ -62,6 +64,8 @@ class GAN(pl.LightningModule):
         opt_gen, opt_discr = self.optimizers()
         X, y = batch
         fake_batch = self(X.size(0))
+        if self.iteration % self.train_log_images_steps == 0:
+            self._log_stats_gen_images(fake_batch, is_train=True)
         if self.it_phase < self.discriminator_steps:
             opt_discr.zero_grad()
             fake_batch = fake_batch.detach()
@@ -71,7 +75,7 @@ class GAN(pl.LightningModule):
             loss = - p_true.log() - (1 - p_fake).log()
             loss = loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps == 0:
-                self.log('loss/train_discriminator', loss, prog_bar=True)
+                self.log('train/loss_discriminator', loss, prog_bar=True)
             self.it_discriminator += 1
             loss.backward()
             opt_discr.step()
@@ -81,7 +85,7 @@ class GAN(pl.LightningModule):
             p_fake = self.discriminator(fake_batch) + 1e-5
             loss = (1-p_fake).log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
-                self.log('loss/train_generator', loss, prog_bar=True)
+                self.log('train/loss_generator', loss, prog_bar=True)
             self.it_generator += 1
             opt_gen.step()
             self.it_phase = 0
@@ -91,19 +95,26 @@ class GAN(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         X, y = batch
         fake_batch = self(X.size(0))
-        grid_fake_batch = torchvision.utils.make_grid(
-            fake_batch
-        )
-        self.logger.experiment.add_image('val/gen_images', grid_fake_batch, global_step=self.iteration)
+        self._log_stats_gen_images(fake_batch, is_train=False)
         logit_true = self.discriminator(X)
         logit_fake = self.discriminator(fake_batch)
         loss_discriminator = logit_true.log() + (1 - logit_fake).log()
         loss_discriminator = - loss_discriminator.mean(dim=0).sum()
-        self.log('loss/val_discriminator', loss_discriminator)
+        self.log('val/loss_discriminator', loss_discriminator)
         loss_generator = (1 - logit_fake).log().mean(dim=0).sum()
-        self.log('loss/val_generator', loss_generator)
+        self.log('val/loss_generator', loss_generator)
         self.iteration += 1
         # return dict(loss_generator=loss_generator, loss_discriminator=loss_discriminator, fake_batch=fake_batch)
+
+    @torch.no_grad()
+    def _log_stats_gen_images(self, fake_batch, is_train: bool):
+        is_train = 'train' if is_train else 'val'
+        grid_fake_batch = torchvision.utils.make_grid(
+            fake_batch
+        )
+        self.logger.experiment.add_image(f'{is_train}/gen_images', grid_fake_batch, global_step=self.iteration)
+        for stat in ['min', 'max', 'mean', 'std']:
+            self.log(f'{is_train}/fake_img_{stat}', getattr(fake_batch[0], stat)())
 
     def configure_optimizers(self):
         return [torch.optim.SGD(self.generator.parameters(), 1e-5, momentum=0.9),

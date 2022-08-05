@@ -3,6 +3,7 @@ latent_size: 8
 discriminator_steps: 2
 discriminator_loss_log_steps: 100
 generator_loss_log_steps: 10
+train_log_images_steps: 100
 generator:
   _target_: torch.nn.Sequential
   _args_:
