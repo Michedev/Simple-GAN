@@ -75,7 +75,7 @@ class GAN(pl.LightningModule):
             p_true = self.discriminator(X) + 1e-5
             p_fake = self.discriminator(fake_batch) + 1e-5
 
-            loss = - (1 - p_true).log() - p_fake.log()
+            loss = - p_true.log() - (1 - p_fake).log()
             loss = loss.mean(dim=0).sum()
             if self.it_discriminator % self.discriminator_loss_log_steps == 0:
                 self.log('train/loss_discriminator', loss, prog_bar=True)
@@ -86,7 +86,7 @@ class GAN(pl.LightningModule):
         else:
             opt_gen.zero_grad()
             p_fake = self.discriminator(fake_batch) + 1e-5
-            loss = p_fake.log().mean(dim=0).sum()
+            loss = - p_fake.log().mean(dim=0).sum()
             if self.it_generator % self.generator_loss_log_steps == 0:
                 self.log('train/loss_generator', loss, prog_bar=True)
             self.it_generator += 1
