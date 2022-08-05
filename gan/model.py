@@ -71,7 +71,7 @@ class GAN(pl.LightningModule):
         if self.it_phase < self.discriminator_steps:
             opt_discr.zero_grad()
             fake_batch = fake_batch.detach()
-            p_true = self.discriminator(X)+ 1e-5
+            p_true = self.discriminator(X) + 1e-5
             p_fake = self.discriminator(fake_batch) + 1e-5
 
             loss = - (1 - p_true).log() - p_fake.log()
