@@ -38,8 +38,9 @@ class GAN(pl.LightningModule):
     def __init__(self, latent_size: int, discriminator_steps: int,
                  generator: torch.nn.Module, discriminator: torch.nn.Module,
                  discriminator_loss_log_steps: int, generator_loss_log_steps: int,
-                 train_log_images_steps: int):
+                 train_log_images_steps: int, log_norm_steps: int):
         super().__init__()
+        self.log_norm_steps = log_norm_steps
         self.latent_size = latent_size
         self.latent_dim = latent_size
         self.discriminator_steps = discriminator_steps
@@ -91,6 +92,8 @@ class GAN(pl.LightningModule):
             self.it_generator += 1
             opt_gen.step()
             self.it_phase = 0
+        if self.iteration % self.log_norm_steps == 0:
+            self._log_grad_norm()
         self.iteration += 1
         return loss
 
@@ -117,6 +120,17 @@ class GAN(pl.LightningModule):
         self.logger.experiment.add_image(f'{is_train}/gen_images', grid_fake_batch, global_step=self.iteration)
         for stat in ['min', 'max', 'mean', 'std']:
             self.log(f'{is_train}/fake_img_{stat}', getattr(fake_batch[0], stat)())
+
+    @torch.no_grad()
+    def _log_grad_norm(self):
+        norm_d = sum(
+            [torch.norm(p.grad) for p in self.discriminator.parameters() if hasattr(p, 'grad') and p.grad is not None])
+        norm_g = sum(
+            [torch.norm(p.grad) for p in self.generator.parameters() if hasattr(p, 'grad') and p.grad is not None])
+        self.log('grad/norm_discriminator', norm_d)
+        self.log('grad/norm_generator', norm_d)
+        self.log('grad/norm_model', norm_d + norm_g)
+
 
     def configure_optimizers(self):
         return [torch.optim.SGD(self.generator.parameters(), 1e-5, momentum=0.9),

@@ -4,6 +4,7 @@ discriminator_steps: 2
 discriminator_loss_log_steps: 100
 generator_loss_log_steps: 10
 train_log_images_steps: 100
+log_norm_steps: 500
 generator:
   _target_: torch.nn.Sequential
   _args_:
