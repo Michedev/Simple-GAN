@@ -5,7 +5,8 @@ defaults:
 val_interval: 1_000
 val_steps: 50
 batch_size: 32
-
+accelerator: null
+devices: null
 hydra:
   run:
     dir: saved_models/${now:%Y_%m_%d_%H_%M_%S}
