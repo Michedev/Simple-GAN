@@ -18,8 +18,8 @@ generator:
       stride: 2
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.ConvTranspose2d  # 8x8
       in_channels: 16
@@ -28,8 +28,8 @@ generator:
       stride: 2
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 32
+      num_groups: 1
+      num_channels: 32
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.ConvTranspose2d  # 16x16
       in_channels: 32
@@ -38,8 +38,8 @@ generator:
       stride: 2
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 32
+      num_groups: 1
+      num_channels: 32
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.ConvTranspose2d  # 16x16
       in_channels: 32
@@ -48,8 +48,8 @@ generator:
       stride: 2
       padding: 3
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 32
+      num_groups: 1
+      num_channels: 32
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 32
@@ -66,8 +66,8 @@ discriminator:
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -75,8 +75,8 @@ discriminator:
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -84,8 +84,8 @@ discriminator:
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -94,8 +94,8 @@ discriminator:
       stride: 2
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -103,18 +103,8 @@ discriminator:
       kernel_size: 3
       padding: 1
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
-    - _target_: torch.nn.LeakyReLU
-    - _target_: torch.nn.Conv2d
-      in_channels: 16
-      out_channels: 16
-      kernel_size: 3
-      padding: 1
-      stride: 2
-    - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -123,8 +113,18 @@ discriminator:
       padding: 1
       stride: 2
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
+    - _target_: torch.nn.LeakyReLU
+    - _target_: torch.nn.Conv2d
+      in_channels: 16
+      out_channels: 16
+      kernel_size: 3
+      padding: 1
+      stride: 2
+    - _target_: torch.nn.GroupNorm
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Conv2d
       in_channels: 16
@@ -133,8 +133,8 @@ discriminator:
       padding: 1
       stride: 2
     - _target_: torch.nn.GroupNorm
-        num_groups: 1
-        num_channels: 16
+      num_groups: 1
+      num_channels: 16
     - _target_: torch.nn.LeakyReLU
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
