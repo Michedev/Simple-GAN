@@ -19,8 +19,9 @@ def train(config):
     train_dl = DataLoader(train_set, shuffle=True, batch_size=config.batch_size)
     test_dl = DataLoader(test_set, shuffle=True, batch_size=config.batch_size)
 
-    checkpoint = ModelCheckpoint('./', filename='gan-mnist-epoch{epoch:02d}-val_loss{val/loss_generator:.2f}',
-                                 monitor='val/loss_generator', save_top_k=3, auto_insert_metric_name=False)
+    checkpoint = ModelCheckpoint('./', filename='gan-mnist-epoch{epoch:02d}-val_loss_gen{val/loss_generator:.2f}'
+                                                '-val_loss_discr{val/loss_discriminator:.2f}',
+                                 save_top_k=3, auto_insert_metric_name=False, save_on_train_epoch_end=True)
 
     trainer = Trainer(callbacks=[checkpoint, ModelSummary(max_depth=2)], val_check_interval=config.val_interval,
                       limit_val_batches=config.val_steps, accelerator=config.accelerator, devices=config.devices)

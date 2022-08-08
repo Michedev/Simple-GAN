@@ -14,6 +14,7 @@ Pytorch GAN implementation done to learn all the caveats behind this model
   - Replaced ReLU with LeakyReLU to improve gradient flowing
   - Use SGD with generator and Adam with discriminator
     - Apply Adam to both generator and discriminator made prevail the discriminator loss during the training
+  - Generator architecture: replaced broadcast layer followed by positional embedding and Conv2d layers with ConvTranspose2d 
 
 # How to use
 
