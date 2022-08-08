@@ -132,10 +132,8 @@ discriminator:
       kernel_size: 3
       padding: 1
       stride: 2
-    - _target_: torch.nn.GroupNorm
-      num_groups: 1
-      num_channels: 16
-    - _target_: torch.nn.LeakyReLU
+    - _target_: torch.nn.AvgPool2d
+      kernel_size: 2
     - _target_: torch.nn.Flatten
       start_dim: 1  #bs, 1
     - _target_: torch.nn.Sigmoid
