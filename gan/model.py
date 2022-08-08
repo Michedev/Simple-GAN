@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 import torch
 import torchvision.utils
-
+import torchvision
 
 class ExpandLatentSpace(torch.nn.Module):
 
@@ -101,8 +101,11 @@ class GAN(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
+
         X, y = batch
         fake_batch = self(X.size(0))
+        if batch_idx == 0:
+            torchvision.utils.save_image(torchvision.utils.make_grid(fake_batch), 'gen_sample.png')
         self._log_stats_gen_images(fake_batch, is_train=False)
         p_true = self.discriminator(X)
         p_fake = self.discriminator(fake_batch)
