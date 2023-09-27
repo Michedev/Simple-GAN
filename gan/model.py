@@ -58,7 +58,7 @@ class GAN(pl.LightningModule):
 
     def forward(self, batch_size=None):
         batch_size = batch_size or 1
-        z = torch.randn(batch_size, self.latent_size)
+        z = torch.randn(batch_size, self.latent_size, device=self.device)
         return self.generator(z)
 
     def training_step(self, batch, batch_idx):
